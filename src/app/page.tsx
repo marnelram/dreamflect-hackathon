@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Dreamflect — type your dream, the agent renders the rest",
+  title: "Dreamflect — we don't interpret your dreams. we help you interpret them yourself.",
   description:
-    "A 6-step morning ritual where Claude builds every screen at runtime — picked from your specific dream. No chat. Just generative UI.",
+    "A self-reflection app. Five minutes in the morning, an optional check-in at night. We ask the right questions until you realize what your dream is telling you.",
 };
 
 export default function LandingPage() {
@@ -33,37 +33,34 @@ export default function LandingPage() {
             dreamflect
           </span>
           <nav className="flex items-center gap-2">
-            <Link href="/reflect" className="hidden sm:block">
+            <Link href="#how" className="hidden sm:block">
               <Button variant="ghost" size="sm">
-                Try the demo
+                How it works
               </Button>
             </Link>
-            <a
-              href="https://github.com/anthropics/claude-code"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <Link href="/reflect">
               <Button variant="outline" size="sm">
-                Hackathon submission
+                Begin
               </Button>
-            </a>
+            </Link>
           </nav>
         </header>
 
         {/* Hero copy */}
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 items-center px-6 sm:px-10">
           <div className="max-w-2xl">
-            <span className="kicker">Generative UI Hackathon · 2026</span>
+            <span className="kicker">A self-reflection app for your dreams</span>
             <h1 className="mt-6 font-serif-italic text-5xl leading-[1.05] tracking-tight text-foreground sm:text-7xl">
-              Type your dream.
+              We don't interpret your dreams.
               <br />
-              <span className="text-primary">The agent renders the rest.</span>
+              <span className="text-primary">We help you interpret them yourself.</span>
             </h1>
             <p className="mt-7 max-w-xl text-lg text-muted-foreground sm:text-xl">
-              A six-step morning ritual where every screen after the first is
-              chosen — and built — at runtime by Claude. Not a chat. Not a form.
-              A surface that couldn't exist as a static component, because it's
-              picked from <em>your</em> dream.
+              Dreams are your subconscious sending you messages. Most apps hand
+              you a dictionary entry and call it a day. Dreamflect asks you the
+              right questions — picked for the dream you actually had — until
+              the meaning lands for <em>you</em>. The moment of self-recognition
+              is the product.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -71,12 +68,12 @@ export default function LandingPage() {
                 <Button size="lg">Reflect on a dream →</Button>
               </Link>
               <a href="#how" className="text-sm text-muted-foreground hover:text-foreground">
-                How it works
+                How a session works
               </a>
             </div>
 
             <p className="mt-12 text-xs uppercase tracking-[0.2em] text-muted-foreground/70">
-              Built with CopilotKit · A2UI · Claude Opus 4.7
+              Five minutes in the morning · An optional check-in at night
             </p>
           </div>
         </div>
@@ -86,21 +83,27 @@ export default function LandingPage() {
       <section id="how" className="relative mx-auto max-w-5xl px-6 py-24 sm:px-10 sm:py-32">
         <span className="kicker">The one big idea</span>
         <h2 className="mt-6 font-serif-italic text-4xl leading-tight tracking-tight sm:text-5xl">
-          The agent doesn't <em className="text-primary not-italic">talk</em>.
-          <br />
-          It <em className="text-primary not-italic">renders</em>.
+          The opposite of a <em className="text-primary not-italic">dream dictionary</em>.
         </h2>
         <p className="mt-8 max-w-3xl text-lg text-muted-foreground">
-          Most AI products bolt a chat box onto the side of an app. Dreamflect
-          flips it: you type one thing — your dream — and Claude calls a
-          frontend tool for every screen that follows. The gap-fill question,
-          the archetype, the probe, the interpretation, the takeaway. All
-          chosen for the dream you typed.
+          A dream about being chased might not <em>feel</em> like a chase dream.
+          A school bus dream might be about belonging, not nostalgia. Dreams are
+          messy and layered — and the meaning that matters is the one you
+          arrive at yourself. Dreamflect doesn't decode for you. It asks
+          questions that are tuned to the specific dream you had, then steps
+          aside so you can react. The pushback, the "actually, it's more
+          about…", is where the insight lives.
         </p>
       </section>
 
       {/* ───────── Steps ───────── */}
-      <section className="mx-auto max-w-6xl px-6 pb-32 sm:px-10">
+      <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
+        <div className="mb-10">
+          <span className="kicker">A morning session, ~5 minutes</span>
+          <h2 className="mt-4 font-serif-italic text-3xl leading-tight tracking-tight sm:text-4xl">
+            Six steps — and not one of them tells you what your dream means.
+          </h2>
+        </div>
         <div className="grid gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-3">
           {STEPS.map((s, i) => (
             <div
@@ -117,6 +120,26 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ───────── Two touchpoints ───────── */}
+      <section className="mx-auto max-w-5xl px-6 pb-32 sm:px-10">
+        <div className="rounded-3xl border border-border bg-card/40 p-8 sm:p-12">
+          <span className="kicker">Two touchpoints, one rhythm</span>
+          <h2 className="mt-4 font-serif-italic text-3xl leading-tight tracking-tight sm:text-4xl">
+            The morning is the question.
+            <br />
+            <span className="text-primary">The evening is where it lands.</span>
+          </h2>
+          <p className="mt-6 max-w-3xl text-muted-foreground">
+            Dreams process things already happening in waking life. So before
+            bed, Dreamflect quietly asks: <em>this morning you reflected on a
+            dream about [theme] — did anything today connect?</em> The odds are
+            high that something did. That's the "oh wait" moment — and the
+            place the deeper work actually happens. Over weeks, recurring
+            patterns surface on their own.
+          </p>
+        </div>
+      </section>
+
       {/* ───────── Final CTA ───────── */}
       <section className="border-t border-border">
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-8 px-6 py-24 sm:flex-row sm:items-center sm:justify-between sm:px-10">
@@ -125,17 +148,18 @@ export default function LandingPage() {
               Tell it about last night.
             </h3>
             <p className="mt-2 text-muted-foreground">
-              Six minutes. One dream. Six screens you've never seen before.
+              Five minutes. One dream. Whatever you realize, you got there
+              yourself.
             </p>
           </div>
           <Link href="/reflect">
-            <Button size="lg">Begin the ritual →</Button>
+            <Button size="lg">Begin →</Button>
           </Link>
         </div>
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6 text-xs uppercase tracking-[0.2em] text-muted-foreground/60 sm:px-10">
             <span>dreamflect · 2026</span>
-            <span>For the Generative UI Global Hackathon</span>
+            <span>Self-reflection, not interpretation</span>
           </div>
         </div>
       </section>
@@ -146,26 +170,26 @@ export default function LandingPage() {
 const STEPS = [
   {
     title: "Capture",
-    body: "You type your dream — once. The only text you'll write all session.",
+    body: "Type or speak your dream while it's still fresh. The only writing you'll do all session.",
   },
   {
     title: "Gap-fill",
-    body: "Claude spots a missing detail and renders the exact question that unlocks the rest.",
+    body: "If you gave us specifics, we ask about feelings. If you gave us feelings, we ask for specifics. The missing half is where the meaning hides.",
   },
   {
-    title: "Archetype",
-    body: "The dream is matched to a symbol — chase, falling, doorway — and a screen forms around it.",
+    title: "Recognize",
+    body: "We name the shape of the dream — chase, falling, hidden room, social disconnection. You confirm or push back. You're driving.",
   },
   {
     title: "Probe",
-    body: "A second-order question, picked for the archetype. Agency for chases. Witness for falls.",
+    body: "One question chosen for the shape of your dream. Agency for chases. Impact for falls. Audience for being-watched.",
   },
   {
-    title: "Interpret",
-    body: "Claude composes an interpretation surface from your specific answers — not a template.",
+    title: "Frame",
+    body: "An interpretive frame, offered — not a verdict, declared. We ask whether it lands. Often the disagreement is where the real insight shows up.",
   },
   {
     title: "Takeaway",
-    body: "A single thing to carry into the day, rendered as a quiet A2UI surface.",
+    body: "One short, portable question to carry into the day. Tonight, we'll quietly ask whether anything rhymed.",
   },
 ];

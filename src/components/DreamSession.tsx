@@ -101,6 +101,16 @@ export function DreamSession({
   const probeAnswerRef = useRef<string | null>(null);
   const resonanceRef = useRef<string | null>(null);
 
+  // Each interactive tool's handler returns a Promise that's only resolved
+  // when the user clicks. While pending, no tool result is emitted, so the
+  // model literally cannot call the next tool — the agent loop is paused.
+  // The resolved value becomes the tool result (the user's response).
+  const sensitivityResolveRef = useRef<(() => void) | null>(null);
+  const gapFillResolveRef = useRef<((answer: string) => void) | null>(null);
+  const archetypeResolveRef = useRef<((confirmed: boolean) => void) | null>(null);
+  const probeResolveRef = useRef<((answer: string) => void) | null>(null);
+  const interpretResolveRef = useRef<((resonance: string) => void) | null>(null);
+
   const commitOnce = useCallback(<T,>(key: string, args: T, fn: (args: T) => void) => {
     const k = `${key}::${JSON.stringify(args)}`;
     if (seenArgs.current.has(k)) return;
@@ -160,7 +170,12 @@ export function DreamSession({
       setStep("sensitivity-check");
       setAwaitingStep(null);
       playTransition();
-      return "ok";
+      return new Promise<string>((resolve) => {
+        sensitivityResolveRef.current = () =>
+          resolve(
+            "User tapped continue gently. Proceed with the normal flow but stay in gentle mode per the SAFETY rules."
+          );
+      });
     },
   });
 
@@ -189,7 +204,9 @@ export function DreamSession({
       setStep("gap-fill");
       setAwaitingStep(null);
       playTransition();
-      return "ok";
+      return new Promise<string>((resolve) => {
+        gapFillResolveRef.current = (answer) => resolve(`User answered: ${answer}`);
+      });
     },
   });
 
@@ -214,7 +231,14 @@ export function DreamSession({
       setStep("archetype");
       setAwaitingStep(null);
       playTransition();
-      return "ok";
+      return new Promise<string>((resolve) => {
+        archetypeResolveRef.current = (confirmed) =>
+          resolve(
+            confirmed
+              ? "User said: that archetype lands. Move on to the probe."
+              : "User said: not quite. Suggest a different archetype."
+          );
+      });
     },
   });
 
@@ -243,7 +267,9 @@ export function DreamSession({
       setStep("probe");
       setAwaitingStep(null);
       playTransition();
-      return "ok";
+      return new Promise<string>((resolve) => {
+        probeResolveRef.current = (answer) => resolve(`User answered: ${answer}`);
+      });
     },
   });
 
@@ -264,7 +290,12 @@ export function DreamSession({
       setStep("interpret");
       setAwaitingStep(null);
       playTransition();
-      return "ok";
+      return new Promise<string>((resolve) => {
+        interpretResolveRef.current = (resonance) =>
+          resolve(
+            `User resonance: ${resonance}. Now emit the takeaway via the emit_takeaway tool, including A2UI messages.`
+          );
+      });
     },
   });
 
@@ -355,43 +386,45 @@ export function DreamSession({
     void sendUserMessage(`Here is my dream:\n\n${dream}`);
   };
 
+  // Click callbacks resolve the pending tool Promise, which emits the
+  // tool result back to the model and lets the agent loop continue. We
+  // don't add a separate user message — the tool result IS the user's
+  // response. setAwaitingStep flips us to the loading screen until the
+  // next tool's handler fires.
   const onSensitivityContinue = () => {
     setAwaitingStep("gap-fill");
-    void sendUserMessage(
-      `User chose to continue gently. Proceed with the normal flow (gap-fill → archetype → probe → interpret → takeaway), staying in gentle mode per the SAFETY rules.`
-    );
+    sensitivityResolveRef.current?.();
+    sensitivityResolveRef.current = null;
   };
 
   const onGapFillAnswer = (answer: string) => {
     setGapFillAnswer(answer);
     gapFillAnswerRef.current = answer;
     setAwaitingStep("archetype");
-    void sendUserMessage(`Gap-fill answer: ${answer}`);
+    gapFillResolveRef.current?.(answer);
+    gapFillResolveRef.current = null;
   };
 
   const onArchetypeConfirm = (confirmed: boolean) => {
     setAwaitingStep(confirmed ? "probe" : "archetype");
-    void sendUserMessage(
-      confirmed
-        ? `That archetype lands. Move on.`
-        : `That's not quite it. Suggest a different archetype.`
-    );
+    archetypeResolveRef.current?.(confirmed);
+    archetypeResolveRef.current = null;
   };
 
   const onProbeAnswer = (answer: string) => {
     setProbeAnswer(answer);
     probeAnswerRef.current = answer;
     setAwaitingStep("interpret");
-    void sendUserMessage(`Probe answer: ${answer}`);
+    probeResolveRef.current?.(answer);
+    probeResolveRef.current = null;
   };
 
   const onResonance = (label: string) => {
     setResonance(label);
     resonanceRef.current = label;
     setAwaitingStep("takeaway");
-    void sendUserMessage(
-      `Resonance: ${label}. Now emit the takeaway via the emit_takeaway tool, including A2UI messages.`
-    );
+    interpretResolveRef.current?.(label);
+    interpretResolveRef.current = null;
   };
 
   const onSaveAndClose = () => {
@@ -420,6 +453,11 @@ export function DreamSession({
     pendingSavePayloadRef.current = null;
     setHasPendingSave(false);
     seenArgs.current.clear();
+    sensitivityResolveRef.current = null;
+    gapFillResolveRef.current = null;
+    archetypeResolveRef.current = null;
+    probeResolveRef.current = null;
+    interpretResolveRef.current = null;
   };
 
   // Inline sign-up flow on the takeaway. The dream payload was held back

@@ -48,9 +48,9 @@ emit_takeaway            → A2UI surface rendered by @a2ui/react
 
 The whole point of "would this be impossible as a chat?" is that the gap-fill question, the archetype, the probe, the interpretation, and the takeaway are all picked from the user's specific dream at runtime. *Being chased* gets a different probe than *falling*; the literal screen for two different users cannot exist as a static component.
 
-## Rendering pattern: handler callbacks fire once
+## Rendering pattern: interactive handlers pause via Promise
 
-The orchestrator is `src/components/DreamSession.tsx`. Each `useFrontendTool` uses the `handler` callback (not `render`) to commit the agent's args into local state:
+The orchestrator is `src/components/DreamSession.tsx`. Each `useFrontendTool` uses the `handler` callback (not `render`) to commit the agent's args into local state. Interactive tools (gap-fill, sensitivity, archetype, probe, interpret) **return a Promise that's only resolved when the user clicks** — while the Promise is pending, no tool result is emitted, so the model literally cannot call the next tool. The agent loop is paused on the client. The resolved string becomes the tool result, and the model reads it as the user's response.
 
 ```ts
 useFrontendTool({
@@ -63,12 +63,21 @@ useFrontendTool({
     setStep("archetype");
     setAwaitingStep(null);
     playTransition();
-    return "ok";
+    return new Promise<string>((resolve) => {
+      archetypeResolveRef.current = (confirmed) =>
+        resolve(confirmed
+          ? "User said: that archetype lands. Move on to the probe."
+          : "User said: not quite. Suggest a different archetype.");
+    });
   },
 });
 ```
 
-`handler` fires **exactly once per tool invocation** — unlike `render`, which fires multiple times across status transitions. We don't need the old `commitOnce` ref-dedup pattern in the handler path. (There's a vestigial `commitOnce` left in the file; the active path is `handler`-based.) If you add a new tool, use `handler`.
+The user-action callback (e.g. `onArchetypeConfirm`) calls the saved `resolveRef`, which emits the tool result and lets the agent loop continue. **Don't add a separate `sendUserMessage(...)` for interactive steps** — the tool result IS the user's response. (Capture is the only step that uses `sendUserMessage`, because there's no in-flight tool to resolve.)
+
+`emit_takeaway` is the only non-interactive tool: it returns `"ok"` immediately and the session ends.
+
+`handler` fires **exactly once per tool invocation** — unlike `render`, which fires multiple times across status transitions. There's a vestigial `commitOnce` still in the file; the active path is `handler`-based. If you add a new tool, use `handler`.
 
 The `render` return value isn't used — we don't render tools inline in a chat thread. State drives a parent-level switch in DreamSession's JSX that mounts the matching `<XxxStep>` inside `<SessionShell>`.
 
@@ -77,7 +86,7 @@ The `render` return value isn't used — we don't render tools inline in a chat 
 `src/components/steps/Loading.tsx` shows step-aware copy ("listening — sitting with what you said…", "considering — naming the shape…", etc.) while the agent decides what to render next. Wired via:
 
 - `awaitingStep: Exclude<StepKind, "capture"> | null` state in DreamSession
-- Each user-action handler (`onCaptureSubmit`, `onGapFillAnswer`, etc.) sets `awaitingStep` to the next expected step **before** calling `sendUserMessage`
+- Each user-action handler (`onCaptureSubmit`, `onGapFillAnswer`, etc.) sets `awaitingStep` to the next expected step **before** triggering the agent — for capture this means calling `sendUserMessage`; for the other steps it means resolving the in-flight tool's Promise
 - Each tool's `handler` clears `awaitingStep` when it fires
 - DreamSession's JSX gives `awaitingStep` priority — if set, render `<LoadingStep>` instead of the step's own component
 
