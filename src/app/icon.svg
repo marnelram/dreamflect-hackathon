@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Dreamflect">
+  <path d="M7 15 A9 9 0 0 1 25 15 Z" fill="#e27a4a"/>
+  <rect x="2" y="15.5" width="28" height="1" fill="#8cb0ff" opacity="0.45"/>
+  <path d="M7 17 A9 9 0 0 0 25 17 Z" fill="#e27a4a" opacity="0.55"/>
+</svg>

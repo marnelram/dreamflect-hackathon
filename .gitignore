@@ -1,0 +1,25 @@
+node_modules
+.next
+out
+.env
+.env.local
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.scratch/
+
+# local Claude Code config and Playwright MCP debug artifacts
+.claude/settings.local.json
+.playwright-mcp/
+
+# scenario-harness output (transplanted from another project)
+.claude/skills/*/reports/
+
+# root-level debug screenshots from Playwright sessions
+/landing-above-fold.png
+/landing-after-fix.png
+/landing-after-tier1.png
+/landing-full.png
+/og-portrait-inline.png
+/og-square-inline.png
+/signup-page.png
