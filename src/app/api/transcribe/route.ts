@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { getOpenAI } from "@/lib/openai";
 
 export const runtime = "nodejs"; // multipart parsing — needs Node, not edge
@@ -10,14 +9,10 @@ const MAX_BYTES = 25 * 1024 * 1024; // Whisper API limit
  * Whisper transcription endpoint. Accepts multipart/form-data with an `audio`
  * field (the Blob from useAudioRecorder). Returns { text }.
  *
- * Auth-gated; the user is paying for these tokens via the org's OPENAI_API_KEY.
+ * Public — anonymous users run the full dream ritual end-to-end. The save
+ * gate at /api/sessions is what requires an account.
  */
 export const POST = async (req: NextRequest) => {
-  const session = await auth.api.getSession({ headers: req.headers });
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
   const openai = getOpenAI();
   if (!openai) {
     return NextResponse.json(
