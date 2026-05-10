@@ -38,7 +38,7 @@ export async function genimg({
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({ model: "gpt-image-1", prompt, n, size, quality }),
+    body: JSON.stringify({ model: "gpt-image-2", prompt, n, size, quality }),
   });
 
   if (!res.ok) {

@@ -48,7 +48,7 @@ export async function generateAndStoreDreamImage(
 
   try {
     const result = await openai.images.generate({
-      model: "gpt-image-1",
+      model: "gpt-image-2",
       prompt: buildPrompt(specs),
       size: "1024x1536",
       quality: "medium",

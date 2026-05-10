@@ -20,7 +20,6 @@ export function Providers({
     <CopilotKitProvider
       key={mode}
       runtimeUrl={runtimeUrl}
-      agent="default"
       useSingleEndpoint={true}
     >
       {children}

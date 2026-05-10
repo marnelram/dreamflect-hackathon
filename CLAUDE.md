@@ -115,7 +115,7 @@ If you see this error fire repeatedly on the *same* step rather than randomly, t
 
 `BuiltInAgent + CopilotRuntime` is constructed **fresh per request** so the system prompt can include the user's prior dreams (memory) and the current mode.
 
-**Agent name.** `<CopilotKitProvider agent="default">` matches the key in `agents: { default: agent }` inside the runtime route. If you rename one, rename both.
+**Agent name.** The runtime route registers a single agent under `agents: { default: agent }` and `<CopilotKitProvider>` omits the `agent` prop — CopilotKit picks the lone registered agent automatically. If you ever register a second agent in the runtime, you must add `agent="<name>"` back to the provider so it knows which one to use.
 
 **v2 imports vs v1.** Use `@copilotkit/react-core/v2` (frontend) and `@copilotkit/runtime/v2` (server) — never the bare paths. Don't mix v1 hooks (`useCopilotChat`, `useCopilotAction`) with v2 (`useAgent`, `useFrontendTool`).
 
