@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getAllSessions } from "@/lib/db";
 import { DreamflectMark } from "@/components/DreamflectMark";
@@ -32,11 +32,23 @@ export default async function HistoryPage() {
           </div>
         </header>
 
-        <div className="mb-10">
-          <p className="kicker">your dreams</p>
-          <h1 className="mt-3 font-serif-italic text-4xl leading-[1.05] sm:text-5xl">
-            what you&rsquo;ve carried.
-          </h1>
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="kicker">your dreams</p>
+            <h1 className="mt-3 font-serif-italic text-4xl leading-[1.05] sm:text-5xl">
+              what you&rsquo;ve carried.
+            </h1>
+          </div>
+          {rows.length > 0 && (
+            <a
+              href="/api/sessions/export"
+              download
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-2 text-sm text-muted-foreground backdrop-blur transition-colors hover:bg-card/60 hover:text-foreground"
+            >
+              <Download className="h-4 w-4" />
+              export
+            </a>
+          )}
         </div>
 
         {rows.length === 0 ? (
